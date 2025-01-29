@@ -8,6 +8,7 @@ import com.alchemygames.engine.scene.Scene;
 import org.lwjgl.Version;
 import org.tinylog.Logger;
 
+
 import static org.lwjgl.opengl.GL11.*;
 
 public class Main implements IAppLogic {
@@ -17,6 +18,7 @@ public class Main implements IAppLogic {
         if (StartupHelper.startNewJvmIfRequired()) return;
         Main main = new Main();
         Engine gameEng = new Engine("Magus!", new Window.WindowOptions(), main);
+        main.checkVersions();
         gameEng.start();
     }
 
