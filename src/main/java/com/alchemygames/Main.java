@@ -3,6 +3,7 @@ package com.alchemygames;
 import com.alchemygames.engine.Engine;
 import com.alchemygames.engine.IAppLogic;
 import com.alchemygames.engine.Window;
+import com.alchemygames.engine.graph.Mesh;
 import com.alchemygames.engine.graph.Render;
 import com.alchemygames.engine.scene.Scene;
 import org.lwjgl.Version;
@@ -18,7 +19,6 @@ public class Main implements IAppLogic {
         if (StartupHelper.startNewJvmIfRequired()) return;
         Main main = new Main();
         Engine gameEng = new Engine("Magus!", new Window.WindowOptions(), main);
-        main.checkVersions();
         gameEng.start();
     }
 
@@ -36,7 +36,13 @@ public class Main implements IAppLogic {
 
     @Override
     public void init(Window window, Scene scene, Render render) {
-
+        float[] positions = new float[]{
+                0.0f, 0.5f, 0.0f,
+                -0.5f, -0.5f, 0.0f,
+                0.5f, -0.5f, 0.0f
+        };
+        Mesh mesh = new Mesh(positions, 3);
+        scene.addMesh("triangleId", mesh);
     }
 
     @Override

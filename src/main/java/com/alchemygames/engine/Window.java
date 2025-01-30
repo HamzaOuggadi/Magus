@@ -14,8 +14,8 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 public class Window {
 
     private long windowHandle;
-    public int width;
-    public int height;
+    private int width;
+    private int height;
     private Callable<Void> resizeFunc;
 
     public static class WindowOptions {
@@ -52,9 +52,6 @@ public class Window {
         } else {
             glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
             GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-            if (vidMode == null) {
-                throw new RuntimeException("Couldn't get the GLFWVidMode of the primary monitor");
-            }
             width = vidMode.width();
             height = vidMode.height();
         }
@@ -133,5 +130,13 @@ public class Window {
 
     public boolean windowShouldClose() {
         return glfwWindowShouldClose(windowHandle);
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
     }
 }
