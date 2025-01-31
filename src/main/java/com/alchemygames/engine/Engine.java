@@ -9,61 +9,52 @@ public class Engine {
     private final IAppLogic appLogic;
     private final Window window;
     private Render render;
+    private boolean running;
     private Scene scene;
-    private boolean isRunning;
-    private int targetFPS;
-    private int targetUPS;
+    private int targetFps;
+    private int targetUps;
 
-    public Engine(String windowTitle, Window.WindowOptions options, IAppLogic appLogic) {
-        window = new Window(windowTitle, options, () -> {
+    public Engine(String windowTitle, Window.WindowOptions opts, IAppLogic appLogic) {
+        window = new Window(windowTitle, opts, () -> {
             resize();
             return null;
         });
-        targetFPS = options.fps;
-        targetUPS = options.ups;;
+        targetFps = opts.fps;
+        targetUps = opts.ups;
         this.appLogic = appLogic;
         render = new Render();
-        scene = new Scene();
+        scene = new Scene(window.getWidth(), window.getHeight());
         appLogic.init(window, scene, render);
-        isRunning = true;
+        running = true;
     }
 
-    public void cleanup() {
+    private void cleanup() {
         appLogic.cleanup();
         render.cleanup();
         scene.cleanup();
         window.cleanup();
     }
 
-    public void start() {
-        isRunning = true;
-        run();
-    }
-
-    public void stop() {
-        isRunning = false;
-    }
-
     private void resize() {
-
+        scene.resize(window.getWidth(), window.getHeight());
     }
 
     private void run() {
         long initialTime = System.currentTimeMillis();
-        float timePerUpdate = 1000f / targetUPS;
-        float timePerFrame = 1000f / targetFPS;
-        float deltaUpdate = 0f;
-        float deltaFPS = 0f;
+        float timeU = 1000.0f / targetUps;
+        float timeR = targetFps > 0 ? 1000.0f / targetFps : 0;
+        float deltaUpdate = 0;
+        float deltaFps = 0;
 
         long updateTime = initialTime;
-        while (isRunning && !window.windowShouldClose()) {
+        while (running && !window.windowShouldClose()) {
             window.pollEvents();
 
             long now = System.currentTimeMillis();
-            deltaUpdate += (now - initialTime) / timePerUpdate;
-            deltaFPS += targetFPS > 0 ? (now - initialTime) / timePerFrame : 0;
+            deltaUpdate += (now - initialTime) / timeU;
+            deltaFps += (now - initialTime) / timeR;
 
-            if (targetFPS <= 0 || deltaFPS >= 1) {
+            if (targetFps <= 0 || deltaFps >= 1) {
                 appLogic.input(window, scene, now - initialTime);
             }
 
@@ -74,14 +65,24 @@ public class Engine {
                 deltaUpdate--;
             }
 
-            if (targetFPS <= 0 || deltaFPS >= 1) {
+            if (targetFps <= 0 || deltaFps >= 1) {
                 render.render(window, scene);
-                deltaFPS--;
+                deltaFps--;
                 window.update();
             }
-
             initialTime = now;
         }
+
         cleanup();
     }
+
+    public void start() {
+        running = true;
+        run();
+    }
+
+    public void stop() {
+        running = false;
+    }
+
 }

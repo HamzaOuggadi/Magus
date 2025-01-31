@@ -23,7 +23,7 @@ public class Window {
         public int fps;
         public int width;
         public int height;
-        public int ups = 0;
+        public int ups = Engine.TARGET_UPS;
     }
 
     public Window(String title, WindowOptions options, Callable<Void> resizeFunc) {
