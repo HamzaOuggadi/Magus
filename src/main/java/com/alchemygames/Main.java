@@ -3,9 +3,7 @@ package com.alchemygames;
 import com.alchemygames.engine.Engine;
 import com.alchemygames.engine.IAppLogic;
 import com.alchemygames.engine.Window;
-import com.alchemygames.engine.graph.Mesh;
-import com.alchemygames.engine.graph.Model;
-import com.alchemygames.engine.graph.Render;
+import com.alchemygames.engine.graph.*;
 import com.alchemygames.engine.scene.Entity;
 import com.alchemygames.engine.scene.Scene;
 import org.joml.Math;
@@ -13,7 +11,6 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.Version;
 import org.tinylog.Logger;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +48,7 @@ public class Main implements IAppLogic {
     @Override
     public void init(Window window, Scene scene, Render render) {
         float[] positions = new float[]{
-                // VO
+                // V0
                 -0.5f, 0.5f, 0.5f,
                 // V1
                 -0.5f, -0.5f, 0.5f,
@@ -67,43 +64,103 @@ public class Main implements IAppLogic {
                 -0.5f, -0.5f, -0.5f,
                 // V7
                 0.5f, -0.5f, -0.5f,
+
+                // For text coords in top face
+                // V8: V4 repeated
+                -0.5f, 0.5f, -0.5f,
+                // V9: V5 repeated
+                0.5f, 0.5f, -0.5f,
+                // V10: V0 repeated
+                -0.5f, 0.5f, 0.5f,
+                // V11: V3 repeated
+                0.5f, 0.5f, 0.5f,
+
+                // For text coords in right face
+                // V12: V3 repeated
+                0.5f, 0.5f, 0.5f,
+                // V13: V2 repeated
+                0.5f, -0.5f, 0.5f,
+
+                // For text coords in left face
+                // V14: V0 repeated
+                -0.5f, 0.5f, 0.5f,
+                // V15: V1 repeated
+                -0.5f, -0.5f, 0.5f,
+
+                // For text coords in bottom face
+                // V16: V6 repeated
+                -0.5f, -0.5f, -0.5f,
+                // V17: V7 repeated
+                0.5f, -0.5f, -0.5f,
+                // V18: V1 repeated
+                -0.5f, -0.5f, 0.5f,
+                // V19: V2 repeated
+                0.5f, -0.5f, 0.5f,
         };
-        float[] colors = new float[] {
-                0.5f, 0.0f, 0.0f,
-                0.0f, 0.5f, 0.0f,
-                0.0f, 0.0f, 0.5f,
-                0.0f, 0.5f, 0.5f,
-                0.5f, 0.0f, 0.0f,
-                0.0f, 0.5f, 0.0f,
-                0.0f, 0.0f, 0.5f,
-                0.0f, 0.5f, 0.5f,
+
+        float[] textureCoordinates = new float[] {
+                0.0f, 0.0f,
+                0.0f, 0.5f,
+                0.5f, 0.5f,
+                0.5f, 0.0f,
+
+                0.0f, 0.0f,
+                0.5f, 0.0f,
+                0.0f, 0.5f,
+                0.5f, 0.5f,
+
+                // For text coords in top face
+                0.0f, 0.5f,
+                0.5f, 0.5f,
+                0.0f, 1.0f,
+                0.5f, 1.0f,
+
+                // For text coords in right face
+                0.0f, 0.0f,
+                0.0f, 0.5f,
+
+                // For text coords in left face
+                0.5f, 0.0f,
+                0.5f, 0.5f,
+
+                // For text coords in bottom face
+                0.5f, 0.0f,
+                1.0f, 0.0f,
+                0.5f, 0.5f,
+                1.0f, 0.5f,
         };
 
         int[] indices = new int[] {
                 // Front face
                 0, 1, 3, 3, 1, 2,
                 // Top Face
-                4, 0, 3, 5, 4, 3,
+                8, 10, 11, 9, 8, 11,
                 // Right face
-                3, 2, 7, 5, 3, 7,
+                12, 13, 7, 5, 12, 7,
                 // Left face
-                6, 1, 0, 6, 0, 4,
+                14, 15, 6, 4, 14, 6,
                 // Bottom face
-                2, 1, 6, 2, 6, 7,
+                16, 18, 19, 17, 16, 19,
                 // Back face
-                7, 6, 4, 7, 4, 5,
+                4, 6, 7, 5, 4, 7
         };
 
-        List<Mesh> mesheList = new ArrayList<>();
-        Mesh mesh = new Mesh(positions, colors, indices);
-        mesheList.add(mesh);
-        String cubeModelId = "cude-model";
-        Model model = new Model(cubeModelId, mesheList);
-        scene.addModel(model);
+        Texture texture = scene.getTextureCache().getTexture("src/main/resources/textures/cube.png");
+        Material material = new Material();
+        material.setTexturePath(texture.getTexturePath());
+        List<Material> materialList = new ArrayList<>();
+        materialList.add(material);
+
+        Mesh cubeMesh = new Mesh(positions, textureCoordinates, indices);
+        material.getMeshList().add(cubeMesh);
+        String cubeModelId = "cube-model";
+        Model cubeModel = new Model(cubeModelId, materialList);
+        scene.addModel(cubeModel);
 
         cubeEntity = new Entity("cube-entity", cubeModelId);
-        cubeEntity.setPosition(0, 0, -2);
+        cubeEntity.setPosition(0, 0, -2f);
         scene.addEntity(cubeEntity);
+
     }
 
     @Override
@@ -134,11 +191,10 @@ public class Main implements IAppLogic {
             displInc.w = 1;
         }
 
-
         displInc.mul(diffTimeMillis / 1000.0f);
 
-        Vector3f entityPos = cubeEntity.getPosition();
-        cubeEntity.setPosition(displInc.x + entityPos.x, displInc.y + entityPos.y, displInc.z + entityPos.z);
+        Vector3f entityPosition = cubeEntity.getPosition();
+        cubeEntity.setPosition(displInc.x + entityPosition.x, displInc.y + entityPosition.y, displInc.z + entityPosition.z);
         cubeEntity.setScale(cubeEntity.getScale() + displInc.w);
         cubeEntity.updateModelMatrix();
 
@@ -146,14 +202,13 @@ public class Main implements IAppLogic {
 
     @Override
     public void update(Window window, Scene scene, long diffTimeMillis) {
-        rotation += .5F;
+        rotation += 1f;
+
         if (rotation > 360) {
             rotation = 0;
         }
 
-        Logger.info("Rotation : {}", rotation);
-
-        cubeEntity.rotate(1, 1, 1, Math.toRadians(rotation));
+        cubeEntity.setRotation(1, 1, 1, Math.toRadians(rotation));
         cubeEntity.updateModelMatrix();
     }
 }

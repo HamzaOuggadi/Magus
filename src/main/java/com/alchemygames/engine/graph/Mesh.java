@@ -20,7 +20,7 @@ public class Mesh {
     private int vaoId;
     private List<Integer> vboIdList;
 
-    public Mesh(float[] positions, float[] colors, int[] indices) {
+    public Mesh(float[] positions, float[] textureCoordinates, int[] indices) {
         this.numVertices = indices.length;
         vboIdList = new ArrayList<>();
 
@@ -37,15 +37,25 @@ public class Mesh {
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
 
-        // Colors VBO
+        // Texture Coordinates
         vboId = glGenBuffers();
         vboIdList.add(vboId);
-        FloatBuffer colorsBuffer = MemoryUtil.memCallocFloat(colors.length);
-        colorsBuffer.put(0, colors);
+        FloatBuffer textureCoordinatesBuffer = MemoryUtil.memCallocFloat(textureCoordinates.length);
+        textureCoordinatesBuffer.put(0, textureCoordinates);
         glBindBuffer(GL_ARRAY_BUFFER, vboId);
-        glBufferData(GL_ARRAY_BUFFER, colorsBuffer, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, textureCoordinatesBuffer, GL_STATIC_DRAW);
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
+        glVertexAttribPointer(1, 2, GL_FLOAT, false, 0, 0);
+
+//        // Colors VBO
+//        vboId = glGenBuffers();
+//        vboIdList.add(vboId);
+//        FloatBuffer colorsBuffer = MemoryUtil.memCallocFloat(colors.length);
+//        colorsBuffer.put(0, colors);
+//        glBindBuffer(GL_ARRAY_BUFFER, vboId);
+//        glBufferData(GL_ARRAY_BUFFER, colorsBuffer, GL_STATIC_DRAW);
+//        glEnableVertexAttribArray(1);
+//        glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
 
         // Index VBO
         vboId = glGenBuffers();
@@ -59,6 +69,8 @@ public class Mesh {
         glBindVertexArray(0);
 
         MemoryUtil.memFree(positionsBuffer);
+        MemoryUtil.memFree(textureCoordinatesBuffer);
+        MemoryUtil.memFree(indicesBuffer);
     }
 
     public void cleanup() {

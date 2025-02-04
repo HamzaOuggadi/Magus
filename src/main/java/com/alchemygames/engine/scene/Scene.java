@@ -1,6 +1,7 @@
 package com.alchemygames.engine.scene;
 
 import com.alchemygames.engine.graph.Model;
+import com.alchemygames.engine.graph.TextureCache;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,10 +10,12 @@ public class Scene {
 
     private Map<String, Model> modelMap;
     private Projection projection;
+    private TextureCache textureCache;
 
     public Scene(int width, int height) {
         modelMap = new HashMap<>();
         projection = new Projection(width, height);
+        textureCache = new TextureCache();
     }
 
     public void addEntity(Entity entity) {
@@ -42,5 +45,9 @@ public class Scene {
 
     public Projection getProjection() {
         return projection;
+    }
+
+    public TextureCache getTextureCache() {
+        return textureCache;
     }
 }

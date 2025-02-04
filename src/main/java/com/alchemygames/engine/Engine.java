@@ -2,6 +2,7 @@ package com.alchemygames.engine;
 
 import com.alchemygames.engine.graph.Render;
 import com.alchemygames.engine.scene.Scene;
+import org.tinylog.Logger;
 
 public class Engine {
 
