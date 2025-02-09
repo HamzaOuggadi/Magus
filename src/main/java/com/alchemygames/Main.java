@@ -2,11 +2,14 @@ package com.alchemygames;
 
 import com.alchemygames.engine.Engine;
 import com.alchemygames.engine.IAppLogic;
+import com.alchemygames.engine.MouseInput;
 import com.alchemygames.engine.Window;
 import com.alchemygames.engine.graph.*;
+import com.alchemygames.engine.scene.Camera;
 import com.alchemygames.engine.scene.Entity;
 import com.alchemygames.engine.scene.Scene;
 import org.joml.Math;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.Version;
@@ -19,6 +22,9 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
 public class Main implements IAppLogic {
+
+    private static final float MOUSE_SENSITIVITY = 0.1f;
+    private static final float MOVEMENT_SPEED = 0.005f;
 
     private Entity cubeEntity;
     private Vector4f displInc = new Vector4f();
@@ -165,6 +171,32 @@ public class Main implements IAppLogic {
 
     @Override
     public void input(Window window, Scene scene, long diffTimeMillis) {
+
+        float move = diffTimeMillis * MOVEMENT_SPEED;
+        Camera camera = scene.getCamera();
+        if (window.isKeyPressed(GLFW_KEY_W)) {
+            camera.moveForward(move);
+        } else if (window.isKeyPressed(GLFW_KEY_S)) {
+            camera.moveBackwards(move);
+        }
+        if (window.isKeyPressed(GLFW_KEY_A)) {
+            camera.moveLeft(move);
+        } else if (window.isKeyPressed(GLFW_KEY_D)) {
+            camera.moveRight(move);
+        }
+        if (window.isKeyPressed(GLFW_KEY_UP)) {
+            camera.moveUp(move);
+        } else if (window.isKeyPressed(GLFW_KEY_DOWN)) {
+            camera.moveDown(move);
+        }
+
+        MouseInput mouseInput = window.getMouseInput();
+        if (mouseInput.isRightButtonPressed()) {
+            Vector2f displVec = mouseInput.getDisplVec();
+            camera.addRotation((float) Math.toRadians(-displVec.x * MOUSE_SENSITIVITY),
+                    (float) Math.toRadians(-displVec.y * MOUSE_SENSITIVITY));
+        }
+
         displInc.zero();
 
         if (window.isKeyPressed(GLFW_KEY_UP)) {
@@ -177,18 +209,6 @@ public class Main implements IAppLogic {
             displInc.x = -1;
         } else if (window.isKeyPressed(GLFW_KEY_RIGHT)) {
             displInc.x = 1;
-        }
-
-        if (window.isKeyPressed(GLFW_KEY_A)) {
-            displInc.z = -1;
-        } else if (window.isKeyPressed(GLFW_KEY_Q)) {
-            displInc.z = 1;
-        }
-
-        if (window.isKeyPressed(GLFW_KEY_Z)) {
-            displInc.w = -1;
-        } else if (window.isKeyPressed(GLFW_KEY_X)) {
-            displInc.w = 1;
         }
 
         displInc.mul(diffTimeMillis / 1000.0f);

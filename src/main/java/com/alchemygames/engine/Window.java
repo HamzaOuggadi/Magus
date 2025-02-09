@@ -17,6 +17,7 @@ public class Window {
     private int width;
     private int height;
     private Callable<Void> resizeFunc;
+    private MouseInput mouseInput;
 
     public static class WindowOptions {
         public boolean compatibleProfile;
@@ -87,6 +88,8 @@ public class Window {
         width = arrWidth[0];
         height = arrHeight[0];
 
+        mouseInput = new MouseInput(windowHandle);
+
     }
 
     public void cleanup() {
@@ -138,5 +141,9 @@ public class Window {
 
     public int getHeight() {
         return height;
+    }
+
+    public MouseInput getMouseInput() {
+        return mouseInput;
     }
 }
